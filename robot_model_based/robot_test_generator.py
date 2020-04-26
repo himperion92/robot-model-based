@@ -112,7 +112,12 @@ class RobotTestGenerator(object):
             self._logger.debug("Generating test case keywords...")
             prev_node = exec_seq[i]
             curr_node = exec_seq[i + 1]
-            edge_label = edges[prev_node][curr_node]['label']
+            edge_i_want = None
+            for edge in edges:
+                if edge[0] == prev_node and edge[1] == curr_node:
+                    edge_i_want = edge
+                    break
+            edge_label = edge_i_want[2]['label']
 
             # in case edge contains an Action
             # if len(edge_label.split('/')) > 1:

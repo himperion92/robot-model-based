@@ -44,7 +44,7 @@ class SequenceGenerator(object):
         elif path_strategy == 'full':
             exec_seqs = self._generate_full_sequence(graph)
 
-        return graph.node, graph.edge, exec_seqs
+        return graph.nodes(data=True), graph.edges(data=True), exec_seqs
 
     def _generate_random_sequence(self, graph, coverage=100):
         """
@@ -114,31 +114,39 @@ class SequenceGenerator(object):
             (list): list of generated sequences.
         """
         self._logger.info("Generating full sequence...")
-        e = [e for e in graph.edges_iter()]
-        n = [n for n in graph.node]
-
-        revers_paths = []
+        reverse_paths = []
         exec_seqs = []
-        # Get all inverse sequences
-        for edge1 in e:
-            for edge2 in e:
-                if edge1[0] == edge2[1] and edge1[1] == edge2[0]:
-                    revers_paths.append(edge1)
 
-        # Go through inverse sequences
-        for revers_path in revers_paths:
-            for path in nx.all_simple_paths(graph, 'n0', revers_path[0]):
-                if path[-2] == revers_path[1]:
-                    exec_seqs.append(path + [revers_path[1]])
+        # Get all cyclic sequences
+        for edge1 in graph.edges:
+            for edge2 in graph.edges:
+                if edge1[0] == edge2[1] and edge1[1] == edge2[0]:
+                    reverse_paths.append(edge1)
+
+        # Go through cyclic sequences
+        for reverse_path in reverse_paths:
+            for path in nx.all_simple_paths(graph, 'n0', reverse_path[0]):
+                if path[-2] == reverse_path[1]:
+                    exec_seqs.append(path + [reverse_path[1]])
 
         # Search all end paths
-        for node in n:
-            if len(graph.successors(node)) == 0:
+        for node in graph.nodes:
+            if graph.successors(node):
                 for path in nx.all_simple_paths(graph, 'n0', node):
                     exec_seqs.append(path)
+        
+        # Remove redundant paths
+        final_seqs = []
+        for seq1 in exec_seqs:
+            is_subset = False
+            for seq2 in exec_seqs:
+                if (len(seq1) < len(seq2)) and seq1 == seq2[:len(seq1)]:
+                    is_subset = True
+            if not is_subset:
+                final_seqs.append(seq1)
 
         self._logger.info("Sequence successfully generated!")
-        return exec_seqs
+        return final_seqs
 
     def _generate_specific_sequence(self, graph):
         # TODO possibility to specify paths
