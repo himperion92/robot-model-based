@@ -27,8 +27,8 @@ class SequenceGenerator(object):
 
         Returns:
             (dict): dictionary with nodes information.
-            (dict): dictionary with edfes information.
-            (list): list of list with information of all sequences.
+            (dict): dictionary with edges information.
+            (list): list of lists with information of all sequences.
         """
         path_strategy = path_strategy.lower()
         if path_strategy not in self._AVAILABLE_WALK_STRATEGIES:
