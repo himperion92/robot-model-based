@@ -48,7 +48,6 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
-.coverage.*
 .cache
 nosetests.xml
 coverage.xml
@@ -111,6 +110,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-
-# flake8 linter conf
-.flake8
