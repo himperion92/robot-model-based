@@ -6,8 +6,11 @@ Robot Framework integrated solution for Model Based Testing using graphical test
 ### yED
 Graph editor tool. Graphs can be exported in .graphml format that will be used as an input of graphwalker-based tools. [https://www.yworks.com/products/yed](https://www.yworks.com/products/yed)
 
+### NetworkX
+Python library for the efficient manipulation of complex networks. This is used to parse and handle the graphs that define the systems under test in an efficient way. [https://networkx.github.io](https://networkx.github.io)
+
 ### Robot Framework
-Generic Python-native test automation tool. [https://robotframework.org/](https://robotframework.org/)
+Generic Python-native test automation tool. This tool will be used as the main test engine, both for execution and results reporting. [https://robotframework.org](https://robotframework.org)
 
 ## Examples
 
@@ -28,5 +31,3 @@ python -m robot_model_based_cli -g <path_to_project>/demo/models/coffee_machine_
 (arguments) tho. Nodes cannot contain neither Actions or Guards.
 * Current version of `robot_model_based` does not support test case documentation generation.
 * Current version of `robot_model_based` does not support specific path configuration.
-
-

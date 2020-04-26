@@ -61,8 +61,8 @@ class SequenceGenerator(object):
         self._logger.info(
             r"Generating random sequence with {cov}% coverage...".format(
                 cov=coverage))
-        e = [e for e in graph.edges_iter()]
-        n = [n for n in graph.node]
+        edges = [edge for edge in graph.edges_iter()]
+        nodes = [node for node in graph.node]
         now_coverage = 0
         exec_seqs = []
 
@@ -98,7 +98,7 @@ class SequenceGenerator(object):
                              i == 0 or exec_seqs[i] != exec_seqs[i - 1]]
                 curr_nodes = list(set([
                     item for sub_list in exec_seqs for item in sub_list]))
-                now_coverage = float(len(curr_nodes)) / float(len(n)) * 100
+                now_coverage = float(len(curr_nodes)) / float(len(nodes)) * 100
 
         self._logger.info("Sequence successfully generated!")
         return exec_seqs
