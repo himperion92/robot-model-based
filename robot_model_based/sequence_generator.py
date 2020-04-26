@@ -126,11 +126,10 @@ class SequenceGenerator(object):
                     revers_paths.append(edge1)
 
         # Go through inverse sequences
-        if len(revers_paths) > 0:
-            for revers_path in revers_paths:
-                for path in nx.all_simple_paths(graph, 'n0', revers_path[0]):
-                    if path[-2] == revers_path[1]:
-                        exec_seqs.append(path + [revers_path[1]])
+        for revers_path in revers_paths:
+            for path in nx.all_simple_paths(graph, 'n0', revers_path[0]):
+                if path[-2] == revers_path[1]:
+                    exec_seqs.append(path + [revers_path[1]])
 
         # Search all end paths
         for node in n:
@@ -143,7 +142,7 @@ class SequenceGenerator(object):
 
     def _generate_specific_sequence(self, graph):
         # TODO possibility to specify paths
-        pass
+        raise NotImplementedError
 
     def _decode_graph(self, file_path):
         """
