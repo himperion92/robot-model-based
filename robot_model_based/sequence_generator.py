@@ -1,7 +1,7 @@
 import logging
 import random
 
-import networkx as nx
+import networkx
 import networkx.readwrite
 
 
@@ -118,23 +118,25 @@ class SequenceGenerator(object):
         exec_seqs = []
 
         # Get all cyclic sequences
-        for edge1 in graph.edges:
-            for edge2 in graph.edges:
+        for edge1 in graph.edges():
+            for edge2 in graph.edges():
                 if edge1[0] == edge2[1] and edge1[1] == edge2[0]:
                     reverse_paths.append(edge1)
 
         # Go through cyclic sequences
         for reverse_path in reverse_paths:
-            for path in nx.all_simple_paths(graph, 'n0', reverse_path[0]):
+            for path in networkx.all_simple_paths(graph, 'n0', reverse_path[0]):
                 if path[-2] == reverse_path[1]:
                     exec_seqs.append(path + [reverse_path[1]])
 
         # Search all end paths
-        for node in graph.nodes:
-            if graph.successors(node):
-                for path in nx.all_simple_paths(graph, 'n0', node):
-                    exec_seqs.append(path)
-        
+        for node in graph.nodes():
+            # try:
+            #     next(graph.successors(node))
+            for path in networkx.all_simple_paths(graph, 'n0', node):
+                exec_seqs.append(path)
+            # except StopIteration:
+            #     pass
         # Remove redundant paths
         final_seqs = []
         for seq1 in exec_seqs:

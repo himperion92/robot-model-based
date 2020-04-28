@@ -10,29 +10,33 @@ class RobotTestGeneratorTests(unittest.TestCase):
     Unitary tests for RobotTestGenerator class
     """
     _SUITE_NAME = 'ts1'
-    _NODES = {'n0': {'y': '122.0', 'x': '603.1', 'label': 'Start'},
-              'n1': {'y': '288.0', 'x': '603.1', 'label': 'idle'},
-              'n2': {'y': '436.0', 'x': '603.1', 'label': 'selecting'},
-              'n3': {'y': '436.0', 'x': '347.20000000000005',
-                     'label': 'canceling'},
-              'n4': {'y': '436.0', 'x': '839.0', 'label': 'serving'},
-              'n5': {'y': '631.06', 'x': '603.1',
-                     'label': 'returning_change'},
-              'n6': {'y': '773.0', 'x': '603.1', 'label': 'idle'},
-              'n7': {'y': '288.0', 'x': '347.20000000000005',
-                     'label': 'off'}}
-    _EDGES = {'n0': {'n1': {'id': 'e1', 'label': 'turn_on'}},
-              'n1': {'n2': {'id': 'e0', 'label': 'input_money'},
-                     'n7': {'id': 'e7', 'label': 'turn_off'}},
-              'n2': {'n3': {'id': 'e2', 'label': 'cancel'},
-                     'n4': {'id': 'e3', 'label': 'select_coffee'}},
-              'n3': {'n5': {'id': 'e5', 'label': 'return_change'}},
-              'n4': {'n5': {'id': 'e4', 'label': 'return_change'}},
-              'n5': {'n6': {'id': 'e6', 'label': 'return_to_idle_state'}},
-              'n6': {}, 'n7': {'n1': {'id': 'e8', 'label': 'turn_on'}}}
+    _NODES = {'n0': {'x': '603.1', 'y': '122.0', 'label': 'Start'},
+              'n1': {'x': '603.1', 'y': '288.0', 'label': 'idle'}, 
+              'n2': {'x': '603.1', 'y': '436.0', 'label': 'selecting'}, 
+              'n3': {'x': '347.20000000000005', 'y': '436.0', 'label': 'canceling'}, 
+              'n4': {'x': '839.0', 'y': '436.0', 'label': 'serving'}, 
+              'n5': {'x': '603.1', 'y': '631.06', 'label': 'returning_change'}, 
+              'n6': {'x': '603.1', 'y': '773.0', 'label': 'idle'}, 
+              'n7': {'x': '347.20000000000005', 'y': '288.0', 'label': 'off'}}
+    _EDGES = [('n0', 'n1', {'label': 'turn_on', 'id': 'e1'}), 
+              ('n1', 'n2', {'label': 'input_money', 'id': 'e0'}), 
+              ('n1', 'n7', {'label': 'turn_off', 'id': 'e7'}), 
+              ('n2', 'n3', {'label': 'cancel', 'id': 'e2'}), 
+              ('n2', 'n4', {'label': 'select_coffee', 'id': 'e3'}), 
+              ('n3', 'n5', {'label': 'return_change', 'id': 'e5'}), 
+              ('n4', 'n5', {'label': 'return_change', 'id': 'e4'}), 
+              ('n5', 'n6', {'label': 'return_to_idle_state', 'id': 'e6'}), 
+              ('n7', 'n1', {'label': 'turn_on', 'id': 'e8'})]
     _EXEC_SEQS = [['n0', 'n1', 'n7', 'n1'],
-                  ['n0', 'n1', 'n2', 'n3', 'n5', 'n6'],
-                  ['n0', 'n1', 'n2', 'n4', 'n5', 'n6']]
+                  ['n0', 'n1'], 
+                  ['n0', 'n1', 'n2'], 
+                  ['n0', 'n1', 'n2', 'n3'], 
+                  ['n0', 'n1', 'n2', 'n4'], 
+                  ['n0', 'n1', 'n2', 'n3', 'n5'], 
+                  ['n0', 'n1', 'n2', 'n4', 'n5'], 
+                  ['n0', 'n1', 'n2', 'n3', 'n5', 'n6'], 
+                  ['n0', 'n1', 'n2', 'n4', 'n5', 'n6'], 
+                  ['n0', 'n1', 'n7']]
     _IMPORTS = ['Module1.Lib1', 'Module1.Lib2']
 
     def setUp(self):
