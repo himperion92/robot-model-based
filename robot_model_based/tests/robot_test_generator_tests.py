@@ -28,40 +28,38 @@ class RobotTestGeneratorTests(unittest.TestCase):
               ('n5', 'n6', {'label': 'return_to_idle_state', 'id': 'e6'}), 
               ('n7', 'n1', {'label': 'turn_on', 'id': 'e8'})]
     _EXEC_SEQS = [['n0', 'n1', 'n7', 'n1'],
-                  ['n0', 'n1'], 
-                  ['n0', 'n1', 'n2'], 
-                  ['n0', 'n1', 'n2', 'n3'], 
-                  ['n0', 'n1', 'n2', 'n4'], 
-                  ['n0', 'n1', 'n2', 'n3', 'n5'], 
-                  ['n0', 'n1', 'n2', 'n4', 'n5'], 
                   ['n0', 'n1', 'n2', 'n3', 'n5', 'n6'], 
-                  ['n0', 'n1', 'n2', 'n4', 'n5', 'n6'], 
-                  ['n0', 'n1', 'n7']]
+                  ['n0', 'n1', 'n2', 'n4', 'n5', 'n6']]
     _IMPORTS = ['Module1.Lib1', 'Module1.Lib2']
 
     def setUp(self):
         logging.basicConfig(level=logging.DEBUG)
         self._tc_gen = RobotTestGenerator()
 
-    @mock.patch('robot_model_based.robot_test_generator.RobotTestGenerator.'
-                '_create_test_cases')
-    @mock.patch('robot.api.TestSuite')
-    def test_create_test_suite(self, mock_robot_ts, mock_create_tc):
-        test_suite_mock = mock.Mock()
-        mock_robot_ts.side_effect = [test_suite_mock]
+    @mock.patch('robot.api')
+    def test_create_test_suite(self, mock_robot_api):
+        test_suite_mock = mock.Mock(name="dummysuite")
+        test_case_1_name = 'Start->idle->off->idle'
+        test_case_2_name = 'Start->idle->selecting->canceling->returning_change->idle'
+        test_case_3_name = 'Start->idle->selecting->serving->returning_change->idle'
+        test_case_1_mock = mock.Mock(name=test_case_1_name)
+        test_case_2_mock = mock.Mock(name=test_case_2_name)
+        test_case_3_mock = mock.Mock(name=test_case_3_name)
+        test_suite_mock.tests.create.side_effect = [test_case_1_mock, 
+                                                    test_case_2_mock, 
+                                                    test_case_3_mock]
+        mock_robot_api.TestSuite.side_effect = [test_suite_mock]
         ts = self._tc_gen.create_test_suite(self._SUITE_NAME, self._NODES,
                                             self._EDGES, self._EXEC_SEQS,
                                             self._IMPORTS)
-        self.assertEqual(test_suite_mock, ts)
+        mock_robot_api.TestSuite.assert_called_once_with(self._SUITE_NAME)
         test_suite_mock.resource.imports.library.assert_has_calls([
             mock.call(self._IMPORTS[0]), mock.call(self._IMPORTS[1])])
-        mock_create_tc.assert_called_once_with(self._NODES, self._EDGES,
-                                               self._EXEC_SEQS)
+        test_suite_mock.tests.create.assert_has_calls([mock.call(test_case_1_name),
+                                                      mock.call(test_case_2_name),
+                                                      mock.call(test_case_3_name)])
+        self.assertEqual(test_suite_mock, ts)
 
-    @mock.patch('robot_model_based.robot_test_generator.RobotTestGenerator.'
-                '_generate_test_data')
-    @mock.patch('robot_model_based.robot_test_generator.RobotTestGenerator.'
-                '_generate_test_name')
     def test_create_test_cases(self, mock_gen_test_name, mock_gen_test_data):
         test_suite_mock = mock.Mock()
         test_case_1 = mock.Mock()
