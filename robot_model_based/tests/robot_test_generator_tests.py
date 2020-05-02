@@ -58,6 +58,32 @@ class RobotTestGeneratorTests(unittest.TestCase):
         test_suite_mock.tests.create.assert_has_calls([mock.call(test_case_1_name),
                                                       mock.call(test_case_2_name),
                                                       mock.call(test_case_3_name)])
+        test_case_1_mock.keywords.create.assert_has_calls([mock.call('turn_on'),
+                                                           mock.call('idle'),
+                                                           mock.call('turn_off'),
+                                                           mock.call('off'),
+                                                           mock.call('turn_on'),
+                                                           mock.call('idle')])                                                      
+        test_case_2_mock.keywords.create.assert_has_calls([mock.call('turn_on'),
+                                                           mock.call('idle'),
+                                                           mock.call('input_money'),
+                                                           mock.call('selecting'),
+                                                           mock.call('cancel'),
+                                                           mock.call('canceling'),
+                                                           mock.call('return_change'),
+                                                           mock.call('returning_change'),
+                                                           mock.call('return_to_idle_state'),
+                                                           mock.call('idle')])
+        test_case_3_mock.keywords.create.assert_has_calls([mock.call('turn_on'),
+                                                           mock.call('idle'),
+                                                           mock.call('input_money'),
+                                                           mock.call('selecting'),
+                                                           mock.call('select_coffee'),
+                                                           mock.call('serving'),
+                                                           mock.call('return_change'),
+                                                           mock.call('returning_change'),
+                                                           mock.call('return_to_idle_state'),
+                                                           mock.call('idle')])                                                        
         self.assertEqual(test_suite_mock, ts)
 
     def test_create_test_cases(self, mock_gen_test_name, mock_gen_test_data):
