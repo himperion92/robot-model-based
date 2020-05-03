@@ -1,5 +1,6 @@
 import logging
 import random
+import math
 
 import networkx
 import networkx.readwrite
@@ -39,69 +40,56 @@ class SequenceGenerator(object):
 
         if path_strategy == 'random':
             coverage = kwargs['coverage'] if 'coverage' in kwargs else 100
-            exec_seqs = self._generate_random_sequence(graph, coverage)
+            exec_seqs = self._generate_coverage_sequence(graph, coverage)
 
         elif path_strategy == 'full':
             exec_seqs = self._generate_full_sequence(graph)
 
         return graph.nodes(data=True), graph.edges(data=True), exec_seqs
 
-    def _generate_random_sequence(self, graph, coverage=100):
+    def _generate_coverage_sequence(self, graph, coverage=100):
         """
-        Generates a random sequence for a given graph.
+        Generates a sequence that covers a percentage of nodes for a
+        given graph.
 
         Args:
             graph (NetworkX graph): graph.
-            coverage (int): percentage of coverage to cover with generated
+            coverage (int): percentage of nodes to cover with generated
                             paths.
 
         Returns:
             (list): list of generated sequences.
         """
+        if coverage not in range(1,101):
+            raise ValueError("Coverage value should be a number between 0 and 100")
+
         self._logger.info(
-            r"Generating random sequence with {cov}% coverage...".format(
+            r"Generating random sequence with at least {cov}% coverage...".format(
                 cov=coverage))
-        edges = [edge for edge in graph.edges_iter()]
-        nodes = [node for node in graph.node]
-        now_coverage = 0
-        exec_seqs = []
+        exec_seqs = self._generate_full_sequence(graph)
+        target_nodes_cov = math.ceil(networkx.number_of_nodes(graph) * (coverage/100))
+        current_nodes_cov = 0
+        final_seqs = []
+        print(exec_seqs)
+        print(target_nodes_cov)
+        exec_seqs = sorted(exec_seqs, key=len, reverse=True)
+        for exec_seq in exec_seqs:
+            print(len(exec_seq))
+            if not final_seqs and len(exec_seq) <= target_nodes_cov:
+                final_seqs.append(exec_seq)
+            else:
+                for final_seq in final_seqs:
+                    new_nodes_cov = len(exec_seq) - len(set.intersection(set(exec_seq), set(final_seq)))
+                    print(new_nodes_cov)
+                    if target_nodes_cov-current_nodes_cov >= new_nodes_cov:
+                            final_seqs.append(exec_seq)
+                            current_nodes_cov += new_nodes_cov
+                    if current_nodes_cov == current_nodes_cov:
+                        return final_seqs
 
-        while now_coverage < coverage:
-            curr_path = []
-            node = 'n0'
-
-            while graph.successors(node):
-
-                if len(graph.successors(node)) > 0 and node == 'n0':
-                    curr_path.append('n0')
-                    node = graph.successors(node)[
-                        int(random.uniform(0, len(graph.successors(node))))]
-                    curr_path.append(node)
-
-                elif len(graph.successors(node)) > 0 and node != 'n0':
-                    prev_node = curr_path[-2]
-                    node = graph.successors(node)[
-                        int(random.uniform(0, len(graph.successors(node))))]
-
-                    if node == prev_node:
-                        break
-                    curr_path.append(node)
-
-                elif len(graph.successors(node)) == 0:
-                    break
-
-            exec_seqs.append(curr_path)
-
-            if len(exec_seqs) > 1:
-                exec_seqs = sorted(exec_seqs)
-                exec_seqs = [exec_seqs[i] for i in range(len(exec_seqs)) if
-                             i == 0 or exec_seqs[i] != exec_seqs[i - 1]]
-                curr_nodes = list(set([
-                    item for sub_list in exec_seqs for item in sub_list]))
-                now_coverage = float(len(curr_nodes)) / float(len(nodes)) * 100
-
-        self._logger.info("Sequence successfully generated!")
-        return exec_seqs
+        if not final_seqs:
+            final_seqs.append(exec_seqs[-1])
+        return final_seqs
 
     def _generate_full_sequence(self, graph):
         """
@@ -131,12 +119,9 @@ class SequenceGenerator(object):
 
         # Search all end paths
         for node in graph.nodes():
-            # try:
-            #     next(graph.successors(node))
             for path in networkx.all_simple_paths(graph, 'n0', node):
                 exec_seqs.append(path)
-            # except StopIteration:
-            #     pass
+
         # Remove redundant paths
         final_seqs = []
         for seq1 in exec_seqs:
